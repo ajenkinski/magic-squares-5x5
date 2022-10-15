@@ -80,7 +80,7 @@ filteredVectors includes excludes =
         if List.null vectors then 
             [] 
         else
-            let vecIdxs = {-# SCC "vectors_intersection" #-} Set.toList $ List.foldl1' Set.intersection vectors
+            let vecIdxs = Set.toList $ List.foldl1' Set.intersection vectors
             in map (allVectors !) vecIdxs
 
 -- Operations on squares
@@ -150,13 +150,6 @@ alignVector indices vals vector =
     in map snd sortedAssignments
 
 
-
-alignVectorToComponent :: ComponentVector -> Component -> Square -> (ComponentVector, [Int], [Int])
-alignVectorToComponent vector comp square =
-    let (indices, vals) = assignedValues comp square
-    in (alignVector indices vals vector, indices, vals)
-
-
 centerIndex :: Idx
 centerIndex = (2, 2)
 
@@ -164,6 +157,8 @@ vectorIndices :: [Int]
 vectorIndices = [0..4]
 
 
+-- Performs one step of the square generation algorithm.  Given an input square, and a component, generates all 
+-- possible new squares resulting from filling in component
 performStep :: Square -> Component -> [Square]
 performStep square component = do
     let (filledIndices, filledVals) = assignedValues component square
@@ -204,7 +199,7 @@ allSquares = do
     guard (minorDiagSquare!(3,1) > minorDiagSquare!(0,0) &&
            minorDiagSquare!(1,3) > minorDiagSquare!(0,0) &&
            minorDiagSquare!(4,0) > minorDiagSquare!(0,4) &&
-           minorDiagSquare!(4,0) > minorDiagSquare!(0,0))
+           minorDiagSquare!(0,4) > minorDiagSquare!(0,0))
 
     -- select 1st row
     row0Square <- performStep minorDiagSquare (Row 0)
