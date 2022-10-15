@@ -3,7 +3,7 @@ module Enumerate5x5 where
 import Data.List ((\\))
 import qualified Data.List as List
 import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
+import qualified Data.IntSet as Set
 import qualified Data.Array as Array
 import Data.Array ((!))
 import qualified Data.Maybe as Maybe
@@ -43,8 +43,11 @@ allNums = [1..25]
 
 -- Generate all component vectors that could be a row, column or diagonal.  These are all distinct sets of 5 numbers
 -- between 1..25 whose sum is 65.
-allVectors :: [ComponentVector]
-allVectors = [v | v <- ssolk 5 allNums, sum v == 65]
+allVectors :: Array.Array Int ComponentVector
+allVectors = 
+    let vecs = [v | v <- ssolk 5 allNums, sum v == 65]
+        numVecs = length vecs
+    in Array.listArray (0, numVecs - 1) vecs
 
 {-
 For this algorithm, we need to be able to efficiently find all component vectors that contain one or more numbers, for
@@ -58,12 +61,12 @@ combinations of those.
 -}
 
 -- Index that allows looking up all vectors containing number x
-vectorsByInclude :: Map.Map Int (Set.Set ComponentVector)
-vectorsByInclude = Map.fromListWith Set.union [(n, Set.singleton v) | v <- allVectors, n <- v]
+vectorsByInclude :: Map.Map Int Set.IntSet
+vectorsByInclude = Map.fromListWith Set.union [(n, Set.singleton i) | (i, v) <- Array.assocs allVectors, n <- v]
 
 -- Index that allows looking up all vectors that don't contain x
-vectorsByExclude :: Map.Map Int (Set.Set ComponentVector)
-vectorsByExclude = Map.fromListWith Set.union [(n, Set.singleton v) | v <- allVectors, n <- allNums \\ v]
+vectorsByExclude :: Map.Map Int Set.IntSet
+vectorsByExclude = Map.fromListWith Set.union [(n, Set.singleton i) | (i, v) <- Array.assocs allVectors, n <- allNums \\ v]
 
 
 -- A function that returns a list of vectors that include includes, and exclude excludes
@@ -76,8 +79,9 @@ filteredVectors includes excludes =
     in 
         if List.null vectors then 
             [] 
-        else 
-            {-# SCC "vectors_intersection" #-} Set.toList $ List.foldl1' Set.intersection vectors
+        else
+            let vecIdxs = {-# SCC "vectors_intersection" #-} Set.toList $ List.foldl1' Set.intersection vectors
+            in map (allVectors !) vecIdxs
 
 -- Operations on squares
         
