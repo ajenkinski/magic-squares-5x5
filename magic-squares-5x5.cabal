@@ -49,3 +49,4 @@ executable magic-squares-5x5
 
     hs-source-dirs:   app
     default-language: Haskell2010
+    ghc-options: -threaded
