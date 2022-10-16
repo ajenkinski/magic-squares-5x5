@@ -22,7 +22,7 @@ maintainer:         ajenkins@cargometrics.com
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  MyLib, Enumerate5x5
+    exposed-modules:  Enumerate5x5
 
     -- Modules included in this library but not exported.
     -- other-modules:

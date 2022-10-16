@@ -1,13 +1,12 @@
 module Main where
 
-import qualified MyLib (someFunc)
-import qualified Enumerate5x5
+import Control.Monad (foldM, when)
 import Data.List (foldl')
-import qualified System.IO as SIO
-import Control.Monad (when, foldM)
-import Text.Printf (printf)
-import Data.Text.Format.Numbers (prettyI)
 import qualified Data.Text
+import Data.Text.Format.Numbers (prettyI)
+import qualified Enumerate5x5
+import qualified System.IO as SIO
+import Text.Printf (printf)
 
 -- Format an integer with thousands separators
 formatInt :: Int -> Data.Text.Text
@@ -24,11 +23,17 @@ main = do
   -- The call to seq in the foldM function is necessary to make squares be solved
   -- as the loop goes along, otherwise all the dots get printed immediately, and
   -- the squares don't actually get solved until counts get printed out.
-  (numValid, totalCount) <- foldM (\(n,t) square ->
-                                  do when (seq n False) (error "Force eval")
-                                     when (t `mod` updateEvery == 0) (printf "%15v squares found, %v valid\r" (formatInt t) (formatInt n))
-                                     return (if Enumerate5x5.squareIsValid square then n+1 else n,
-                                             t + 1))
-                       (0, 0) squares
+  (numValid, totalCount) <-
+    foldM
+      ( \(n, t) square ->
+          do
+            when (seq n False) (error "Force eval")
+            when (t `mod` updateEvery == 0) (printf "%15v squares found, %v valid\r" (formatInt t) (formatInt n))
+            return
+              ( if Enumerate5x5.squareIsValid square then n + 1 else n,
+                t + 1
+              )
+      )
+      (0, 0)
+      squares
   printf "\ntotalCount = %v, numValid = %v\n" (formatInt totalCount) (formatInt numValid)
-
