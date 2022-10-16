@@ -1,7 +1,8 @@
 module Main where
 
-import Control.Monad (foldM, when)
-import Data.List (foldl')
+import Control.Monad (foldM, forM_, when)
+import qualified Control.Parallel.Strategies as PS
+import Data.List (foldl', foldl1')
 import qualified Data.Text
 import Data.Text.Format.Numbers (prettyI)
 import qualified Enumerate5x5
@@ -14,6 +15,10 @@ formatInt = prettyI (Just ',')
 
 main :: IO ()
 main = do
+  computeAllParallel
+
+computeAllSequentially :: IO ()
+computeAllSequentially = do
   let squares = Enumerate5x5.allSquares
   let validate square = sum (Enumerate5x5.allSquareValues square) == 325
   -- print an update every updateEvery squares so I know it's making progress
@@ -37,3 +42,23 @@ main = do
       (0, 0)
       squares
   printf "\ntotalCount = %v, numValid = %v\n" (formatInt totalCount) (formatInt numValid)
+
+checkSquares :: [Enumerate5x5.Square] -> (Int, Int)
+checkSquares squares =
+  let updateStats (numTotal, numValid) square =
+        let numTotal' = numTotal + 1
+            numValid' = numValid + (if Enumerate5x5.squareIsValid square then 1 else 0) 
+        in numTotal' `seq` numValid' `seq` (numTotal', numValid')
+   in foldl' updateStats (0, 0) squares
+
+computeAllParallel :: IO ()
+computeAllParallel = do
+  putStrLn "Starting parallel computation"
+  let centerValues = [1 .. 13]
+  let squaresPerCenter = map Enumerate5x5.allSquaresForCenter centerValues
+  let statsPerCenter = PS.parMap PS.rseq checkSquares squaresPerCenter
+  forM_ (zip centerValues statsPerCenter) $ \(centerValue, (totalCount, validCount)) ->
+    printf "For center value %d: total squares = %d, num valid = %d\n" centerValue totalCount validCount
+
+  let (totalCount, validCount) = foldl1' (\(total, valid) (total', valid') -> (total + total', valid + valid')) statsPerCenter
+  printf "Total squares found = %d, # valid = %d\n" totalCount validCount

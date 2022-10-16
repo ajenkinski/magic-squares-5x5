@@ -185,10 +185,8 @@ W I U D Y
 G N Q O E
 -}
 
-allSquares :: [Square]
-allSquares = do
-  -- select the center value
-  centerValue <- [1..13]
+allSquaresForCenter :: Int -> [Square]
+allSquaresForCenter centerValue = do
   let centerSquare = emptySquare Array.// [(centerIndex, centerValue)]
 
   -- select the main diagonal
@@ -242,3 +240,10 @@ allSquares = do
   if col4Square ! centerIndex < 13
     then [col4Square, fmap (26 -) col4Square]
     else return col4Square
+
+
+allSquares :: [Square]
+allSquares = do
+  -- select the center value
+  centerValue <- [1..13]
+  allSquaresForCenter centerValue

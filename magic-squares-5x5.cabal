@@ -45,6 +45,7 @@ executable magic-squares-5x5
         base ^>=4.16.3.0,
         format-numbers,
         text,
+        parallel,
         magic-squares-5x5
 
     hs-source-dirs:   app
