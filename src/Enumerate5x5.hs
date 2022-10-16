@@ -188,7 +188,7 @@ G N Q O E
 allSquares :: [Square]
 allSquares = do
   -- select the center value
-  centerValue <- allNums
+  centerValue <- [1..13]
   let centerSquare = emptySquare Array.// [(centerIndex, centerValue)]
 
   -- select the main diagonal
