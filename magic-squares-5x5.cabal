@@ -13,8 +13,8 @@ version:            0.1.0.0
 
 -- The license under which the package is released.
 -- license:
-author:             ajenkins-cargometrics
-maintainer:         ajenkins@cargometrics.com
+author:             Adam Jenkins
+maintainer:         adam@thejenkins.org
 
 -- A copyright notice.
 -- copyright:
