@@ -1,6 +1,6 @@
 module Enumerate5x5 where
 
-import Control.Monad (guard, join)
+import Control.Monad (guard)
 import Data.Array ((!))
 import qualified Data.Array as Array
 import qualified Data.IntSet as Set

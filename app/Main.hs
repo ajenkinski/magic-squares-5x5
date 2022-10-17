@@ -1,9 +1,9 @@
 module Main where
 
 import Control.Concurrent (getNumCapabilities)
-import Control.Monad (foldM, forM_, when)
+import Control.Monad (foldM, when)
 import qualified Control.Parallel.Strategies as PS
-import Data.List (foldl', foldl1')
+import Data.List (foldl')
 import qualified Data.Text
 import Data.Text.Format.Numbers (prettyI)
 import qualified Enumerate5x5
@@ -24,7 +24,6 @@ main = do
 computeAllSequentially :: IO ()
 computeAllSequentially = do
   let squares = Enumerate5x5.allSquares
-  let validate square = sum (Enumerate5x5.allSquareValues square) == 325
   -- print an update every updateEvery squares so I know it's making progress
   let updateEvery = 1000
   printf "Starting computation. Printing an update every %v squares.\n" (formatInt updateEvery)
