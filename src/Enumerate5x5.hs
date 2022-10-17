@@ -185,20 +185,8 @@ W I U D Y
 G N Q O E
 -}
 
-allSquaresForCenter :: Int -> [Square]
-allSquaresForCenter centerValue = do
-  let centerSquare = emptySquare Array.// [(centerIndex, centerValue)]
-
-  -- select the main diagonal
-  mainDiagSquare <- performStep centerSquare MainDiag
-
-  -- Contraint E > B, D > C > B
-  guard
-    ( mainDiagSquare ! (4, 4) > mainDiagSquare ! (0, 0)
-        && mainDiagSquare ! (3, 3) > mainDiagSquare ! (1, 1)
-        && mainDiagSquare ! (1, 1) > mainDiagSquare ! (0, 0)
-    )
-
+allSquaresForMainDiag :: Square -> [Square]
+allSquaresForMainDiag mainDiagSquare = do
   -- select minor diagonal
   minorDiagSquare <- performStep mainDiagSquare MinorDiag
 
@@ -241,8 +229,26 @@ allSquaresForCenter centerValue = do
     then [col4Square, fmap (26 -) col4Square]
     else return col4Square
 
-allSquares :: [Square]
-allSquares = do
+-- All squares with just the main diagonal filled in
+allMainDiagSquares :: [Square]
+allMainDiagSquares = do
   -- select the center value
   centerValue <- [1 .. 13]
-  allSquaresForCenter centerValue
+  let centerSquare = emptySquare Array.// [(centerIndex, centerValue)]
+
+  -- select the main diagonal
+  mainDiagSquare <- performStep centerSquare MainDiag
+
+  -- Contraint E > B, D > C > B
+  guard
+    ( mainDiagSquare ! (4, 4) > mainDiagSquare ! (0, 0)
+        && mainDiagSquare ! (3, 3) > mainDiagSquare ! (1, 1)
+        && mainDiagSquare ! (1, 1) > mainDiagSquare ! (0, 0)
+    )
+
+  return mainDiagSquare
+
+allSquares :: [Square]
+allSquares = do
+  mainDiagSquare <- allMainDiagSquares
+  allSquaresForMainDiag mainDiagSquare

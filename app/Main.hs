@@ -55,11 +55,18 @@ checkSquares squares =
 computeAllParallel :: IO ()
 computeAllParallel = do
   putStrLn "Starting parallel computation"
-  let centerValues = [1 .. 13]
-  let squaresPerCenter = map Enumerate5x5.allSquaresForCenter centerValues
-  let statsPerCenter = PS.parMap PS.rseq checkSquares squaresPerCenter
-  forM_ (zip centerValues statsPerCenter) $ \(centerValue, (totalCount, validCount)) ->
-    printf "For center value %d: total squares = %d, num valid = %d\n" centerValue totalCount validCount
-
-  let (totalCount, validCount) = foldl1' (\(total, valid) (total', valid') -> (total + total', valid + valid')) statsPerCenter
+  let squaresPerGroup = map Enumerate5x5.allSquaresForMainDiag Enumerate5x5.allMainDiagSquares
+  let statsPerGroup = PS.parMap PS.rseq checkSquares squaresPerGroup
+  -- disable buffering, otherwise progress updates without a newline don't get immediately displayed
+  SIO.hSetBuffering SIO.stdout SIO.NoBuffering
+  (totalCount, validCount) <-
+    foldM
+      ( \(total, valid) (total', valid') ->
+          do
+            let (newTotal, newNumValid) = (total + total', valid + valid')
+            printf "%15v squares found, %v valid\r" (formatInt newTotal) (formatInt newNumValid)
+            return (newTotal, newNumValid)
+      )
+      (0, 0)
+      statsPerGroup
   printf "Total squares found = %d, # valid = %d\n" totalCount validCount
