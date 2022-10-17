@@ -1,7 +1,9 @@
 # Generate all 5x5 magic squares
 
 This project implements the algorithm described at 
+
 https://www.researchgate.net/publication/294288450_Generation_of_all_magic_squares_of_order_5_and_interesting_patterns_finding
+
 I have also checked in a copy of the paper as a PDF [here](./Generation_of_all_magic_squares_of_order_5_and_int.pdf).
 
 ## Setup
@@ -26,4 +28,4 @@ To run in multi-threaded mode, run
 cabal run magic-squares-5x5 -- +RTS -N16
 ```
 
-where the number after `-N` specifies how many threads to start up.  Currently the program won't take advantage more than 13 threads.
+where the number after `-N` specifies how many threads to start up.  Currently the program won't take advantage of more than 13 threads.
