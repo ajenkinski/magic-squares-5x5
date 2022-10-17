@@ -241,9 +241,8 @@ allSquaresForCenter centerValue = do
     then [col4Square, fmap (26 -) col4Square]
     else return col4Square
 
-
 allSquares :: [Square]
 allSquares = do
   -- select the center value
-  centerValue <- [1..13]
+  centerValue <- [1 .. 13]
   allSquaresForCenter centerValue
