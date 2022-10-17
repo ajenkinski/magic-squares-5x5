@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Concurrent (getNumCapabilities)
 import Control.Monad (foldM, forM_, when)
 import qualified Control.Parallel.Strategies as PS
 import Data.List (foldl', foldl1')
@@ -15,7 +16,10 @@ formatInt = prettyI (Just ',')
 
 main :: IO ()
 main = do
-  computeAllParallel
+  numThreads <- getNumCapabilities
+  if numThreads > 1
+    then computeAllParallel
+    else computeAllSequentially
 
 computeAllSequentially :: IO ()
 computeAllSequentially = do
@@ -47,8 +51,8 @@ checkSquares :: [Enumerate5x5.Square] -> (Int, Int)
 checkSquares squares =
   let updateStats (numTotal, numValid) square =
         let numTotal' = numTotal + 1
-            numValid' = numValid + (if Enumerate5x5.squareIsValid square then 1 else 0) 
-        in numTotal' `seq` numValid' `seq` (numTotal', numValid')
+            numValid' = numValid + (if Enumerate5x5.squareIsValid square then 1 else 0)
+         in numTotal' `seq` numValid' `seq` (numTotal', numValid')
    in foldl' updateStats (0, 0) squares
 
 computeAllParallel :: IO ()
