@@ -56,7 +56,8 @@ computeAllParallel :: IO ()
 computeAllParallel = do
   putStrLn "Starting parallel computation"
   let squaresPerGroup = map Enumerate5x5.allSquaresForMainDiag Enumerate5x5.allMainDiagSquares
-  let statsPerGroup = PS.parMap PS.rseq checkSquares squaresPerGroup
+  let strategy = PS.parListChunk 10 PS.rdeepseq
+  let statsPerGroup = map checkSquares squaresPerGroup `PS.using` strategy
   -- disable buffering, otherwise progress updates without a newline don't get immediately displayed
   SIO.hSetBuffering SIO.stdout SIO.NoBuffering
   (totalCount, validCount) <-
