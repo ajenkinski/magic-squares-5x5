@@ -10,7 +10,12 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
 import Text.Printf (printf)
 
--- Return all "subsets of length k" of xs
+{- 
+Return all "subsets of length k" of xs 
+
+>>> ssolk 2 [1,2,3]
+[[1,2],[1,3],[2,3]]
+-}
 ssolk :: Int -> [a] -> [[a]]
 ssolk k xs
   | k == 0 = [[]]
@@ -29,6 +34,13 @@ data Component
   | MainDiag -- top left to bottom right
   | MinorDiag -- top right to bottom left
 
+{- 
+>>> componentIndices MainDiag
+[(0,0),(1,1),(2,2),(3,3),(4,4)]
+
+>>> componentIndices (Row 1)
+[(1,0),(1,1),(1,2),(1,3),(1,4)]
+-}
 componentIndices :: Component -> [Idx]
 componentIndices comp =
   case comp of
